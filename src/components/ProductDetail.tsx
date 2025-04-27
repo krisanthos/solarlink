@@ -72,7 +72,7 @@ const ProductDetail = ({ product }: ProductDetailProps) => {
             <span className="ml-2 text-muted-foreground">({rating})</span>
           </div>
           <div className="mt-4 text-2xl font-bold text-solar-blue dark:text-solar-red">
-            ${price.toFixed(2)}
+            ₦{price.toLocaleString()}
           </div>
           <p className="mt-4 text-muted-foreground">
             {description}
@@ -137,7 +137,7 @@ const ProductDetail = ({ product }: ProductDetailProps) => {
             </dl>
           </TabsContent>
           <TabsContent value="shipping" className="pt-4 space-y-2">
-            <p className="text-sm">Free shipping on all orders over $500.</p>
+            <p className="text-sm">Free shipping on all orders over ₦200,000.</p>
             <p className="text-sm">Standard delivery: 5-7 business days.</p>
             <p className="text-sm">Express delivery available at checkout.</p>
             <p className="text-sm">Professional installation available.</p>
