@@ -55,7 +55,7 @@ const ProductCard = ({ product, className }: ProductCardProps) => {
           <span className="text-xs text-muted-foreground ml-1">({rating})</span>
         </div>
         <div className="flex items-center justify-between">
-          <div className="font-semibold">${price.toFixed(2)}</div>
+          <div className="font-semibold">₦{price.toLocaleString()}</div>
           <div className="text-xs px-2 py-1 rounded bg-primary/10 text-primary">
             View Details
           </div>
@@ -66,3 +66,4 @@ const ProductCard = ({ product, className }: ProductCardProps) => {
 };
 
 export default ProductCard;
+  
