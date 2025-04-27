@@ -19,9 +19,29 @@ export interface Product {
   imageUrl: string;
   rating: number;
   inStock: boolean;
+  views?: number;
+  purchases?: number;
 }
 
 export type ProductFilterOption = {
   label: string;
   value: string;
+};
+
+export interface CategoryStats {
+  category: ProductCategory;
+  views: number;
+  purchases: number;
+}
+
+export interface AdminStats {
+  totalViews: number;
+  totalPurchases: number;
+  categoryStats: CategoryStats[];
+  topProducts: Pick<Product, 'id' | 'name' | 'views' | 'purchases'>[];
+}
+
+export type AdminUser = {
+  username: string;
+  role: 'admin' | 'editor';
 };

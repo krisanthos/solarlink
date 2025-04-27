@@ -13,6 +13,8 @@ import ProductDetailPage from "@/pages/ProductDetailPage";
 import AboutPage from "@/pages/AboutPage";
 import ContactPage from "@/pages/ContactPage";
 import NotFound from "@/pages/NotFound";
+import AdminDashboardPage from "@/pages/AdminDashboardPage";
+import { AdminRoute } from "@/components/admin/AdminRoute";
 
 const queryClient = new QueryClient();
 
@@ -32,6 +34,12 @@ const App = () => (
                 <Route path="/products/:slug" element={<ProductDetailPage />} />
                 <Route path="/about" element={<AboutPage />} />
                 <Route path="/contact" element={<ContactPage />} />
+                
+                {/* Admin Routes */}
+                <Route element={<AdminRoute />}>
+                  <Route path="/admin" element={<AdminDashboardPage />} />
+                </Route>
+                
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </main>
