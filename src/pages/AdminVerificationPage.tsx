@@ -1,21 +1,22 @@
-
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
+import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { EyeIcon, EyeOffIcon } from "lucide-react";
 
 const AdminVerificationPage = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [otp, setOtp] = useState("");
+  const [password, setPassword] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   
-  // The correct code - in a real app this should be dynamically generated and sent via SMS
-  const correctCode = "123456";
+  // The correct password
+  const correctPassword = "#solarlink#€€€";
   
   // Phone numbers and address info
   const phoneNumbers = ["+234 9032334918", "+234 7025615619"];
@@ -26,7 +27,10 @@ const AdminVerificationPage = () => {
     
     // Simulate API call with a delay
     setTimeout(() => {
-      if (otp === correctCode) {
+      if (password === correctPassword) {
+        // Store the admin verification status in localStorage
+        localStorage.setItem("adminVerified", "true");
+        
         toast({
           title: "Success!",
           description: "Admin access granted.",
@@ -35,8 +39,8 @@ const AdminVerificationPage = () => {
         navigate("/admin");
       } else {
         toast({
-          title: "Invalid Code",
-          description: "The verification code you entered is incorrect.",
+          title: "Invalid Password",
+          description: "The password you entered is incorrect.",
           variant: "destructive",
         });
       }
@@ -58,8 +62,9 @@ const AdminVerificationPage = () => {
         <CardHeader>
           <CardTitle className="text-center">Admin Verification</CardTitle>
           <CardDescription className="text-center">
-            Enter the 6-digit verification code sent to:
+            Enter the administrator password to access the admin panel.
             <div className="mt-2">
+              <p>Business contact numbers:</p>
               {phoneNumbers.map((phone, index) => (
                 <p key={index} className="font-medium text-foreground">{phone}</p>
               ))}
@@ -73,17 +78,25 @@ const AdminVerificationPage = () => {
               <p className="font-medium text-foreground">{address}</p>
             </div>
             
-            <div className="mt-4">
-              <InputOTP maxLength={6} value={otp} onChange={setOtp}>
-                <InputOTPGroup>
-                  <InputOTPSlot index={0} />
-                  <InputOTPSlot index={1} />
-                  <InputOTPSlot index={2} />
-                  <InputOTPSlot index={3} />
-                  <InputOTPSlot index={4} />
-                  <InputOTPSlot index={5} />
-                </InputOTPGroup>
-              </InputOTP>
+            <div className="mt-4 relative">
+              <Input 
+                type={showPassword ? "text" : "password"}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Enter password"
+                className="pr-10"
+              />
+              <button 
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+              >
+                {showPassword ? (
+                  <EyeOffIcon className="h-4 w-4" />
+                ) : (
+                  <EyeIcon className="h-4 w-4" />
+                )}
+              </button>
             </div>
           </div>
         </CardContent>
@@ -93,7 +106,7 @@ const AdminVerificationPage = () => {
           </Button>
           <Button 
             onClick={handleVerify}
-            disabled={otp.length !== 6 || isSubmitting}
+            disabled={password.length === 0 || isSubmitting}
           >
             {isSubmitting ? "Verifying..." : "Verify"}
           </Button>
@@ -113,13 +126,13 @@ const AdminVerificationPage = () => {
               setShowConfirmDialog(false);
               navigate('/');
             }}>
-              No, go to home page
+              Yes, continue to admin
             </Button>
             <Button onClick={() => {
               setShowConfirmDialog(false);
               navigate('/admin-verification');
             }}>
-              Yes, continue to admin
+              No, go to home page
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -129,3 +142,4 @@ const AdminVerificationPage = () => {
 };
 
 export default AdminVerificationPage;
+            
