@@ -8,10 +8,12 @@ import { AdminUser } from "@/utils/types";
 const mockGetCurrentUser = (): AdminUser | null => {
   // This is just for demo purposes
   // A real implementation would check localStorage or a proper auth context
-  return {
+  const isVerified = localStorage.getItem("adminVerified") === "true";
+  
+  return isVerified ? {
     username: "admin",
     role: "admin"
-  };
+  } : null;
 };
 
 export const AdminRoute = () => {
@@ -28,7 +30,7 @@ export const AdminRoute = () => {
     if (!user) {
       toast({
         title: "Authentication Required",
-        description: "You must be logged in as an admin to view this page.",
+        description: "You must be verified as an admin to view this page.",
         variant: "destructive"
       });
     }
@@ -38,5 +40,5 @@ export const AdminRoute = () => {
     return <div className="flex justify-center items-center h-screen">Loading...</div>;
   }
 
-  return isAuthenticated ? <Outlet /> : <Navigate to="/" />;
+  return isAuthenticated ? <Outlet /> : <Navigate to="/admin-verification" />;
 };

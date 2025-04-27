@@ -12,8 +12,11 @@ import ProductsPage from "@/pages/ProductsPage";
 import ProductDetailPage from "@/pages/ProductDetailPage";
 import AboutPage from "@/pages/AboutPage";
 import ContactPage from "@/pages/ContactPage";
+import PrivacyPolicyPage from "@/pages/PrivacyPolicyPage";
+import TermsPage from "@/pages/TermsPage";
 import NotFound from "@/pages/NotFound";
 import AdminDashboardPage from "@/pages/AdminDashboardPage";
+import AdminVerificationPage from "@/pages/AdminVerificationPage";
 import { AdminRoute } from "@/components/admin/AdminRoute";
 
 const queryClient = new QueryClient();
@@ -34,6 +37,11 @@ const App = () => (
                 <Route path="/products/:slug" element={<ProductDetailPage />} />
                 <Route path="/about" element={<AboutPage />} />
                 <Route path="/contact" element={<ContactPage />} />
+                <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
+                <Route path="/terms" element={<TermsPage />} />
+                
+                {/* Admin Verification */}
+                <Route path="/admin-verification" element={<AdminVerificationPage />} />
                 
                 {/* Admin Routes */}
                 <Route element={<AdminRoute />}>
