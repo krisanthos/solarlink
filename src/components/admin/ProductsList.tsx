@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import { edit, trash2 } from "lucide-react";
+import { Edit, Trash2 } from "lucide-react";
 
 interface ProductsListProps {
   products: Product[];
@@ -70,7 +70,7 @@ export const ProductsList = ({ products, onEdit, onDelete }: ProductsListProps) 
                         onClick={() => onEdit(product)}
                         className="h-8 w-8"
                       >
-                        <edit className="h-4 w-4" />
+                        <Edit className="h-4 w-4" />
                         <span className="sr-only">Edit</span>
                       </Button>
                       
@@ -81,7 +81,7 @@ export const ProductsList = ({ products, onEdit, onDelete }: ProductsListProps) 
                             size="icon"
                             className="h-8 w-8 text-destructive hover:text-destructive/90"
                           >
-                            <trash2 className="h-4 w-4" />
+                            <Trash2 className="h-4 w-4" />
                             <span className="sr-only">Delete</span>
                           </Button>
                         </AlertDialogTrigger>
