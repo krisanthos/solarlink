@@ -1,21 +1,20 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { AdminStats, CategoryStats, Product, ProductCategory } from "@/utils/types";
+import { AdminStats, Product, ProductCategory } from "@/utils/types";
 import { ProductForm } from "@/components/admin/ProductForm";
 import { CategoryForm } from "@/components/admin/CategoryForm";
 import { ProductsList } from "@/components/admin/ProductsList";
 import { CategoryList } from "@/components/admin/CategoryList";
-import { AdminDashboardStats } from "@/components/admin/AdminDashboardStats";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { products, getProductCategories } from "@/data/products";
-import { ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent } from "@/components/ui/chart";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, ResponsiveContainer } from 'recharts';
-import { BarChart, Bar, PieChart, Pie, Cell } from 'recharts';
+import { StatsOverview } from "@/components/admin/StatsOverview";
+import { TimeSeriesChart } from "@/components/admin/charts/TimeSeriesChart";
+import { CategoryPerformanceChart } from "@/components/admin/charts/CategoryPerformanceChart";
+import { TopProductsChart } from "@/components/admin/charts/TopProductsChart";
+import { ChartDialog } from "@/components/admin/ChartDialog";
 
 const AdminDashboardPage = () => {
   const navigate = useNavigate();
@@ -27,14 +26,8 @@ const AdminDashboardPage = () => {
   const [currentProduct, setCurrentProduct] = useState<Product | null>(null);
   const [currentCategory, setCurrentCategory] = useState<ProductCategory | null>(null);
   
-  // Set up auth verification effect
   useEffect(() => {
-    // For demo purposes, store verification in localStorage when admin reaches this page
     localStorage.setItem("adminVerified", "true");
-    
-    return () => {
-      // Clean up - in a real app, you would have proper auth state management
-    };
   }, []);
 
   // Mock stats data - in a real app this would come from an API
@@ -54,7 +47,7 @@ const AdminDashboardPage = () => {
     }))
   };
 
-  // Generate some time-based data for charts
+  // Generate time-based data for charts
   const generateTimeData = () => {
     const data = [];
     const now = new Date();
@@ -71,8 +64,6 @@ const AdminDashboardPage = () => {
   };
 
   const timeData = generateTimeData();
-  
-  const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8'];
 
   const handleAddProduct = (product: Product) => {
     setAdminProducts([...adminProducts, product]);
@@ -156,13 +147,6 @@ const AdminDashboardPage = () => {
     setCurrentCategory(category);
   };
 
-  // Chart config for styling
-  const chartConfig = {
-    views: { label: 'Views', color: '#2563eb' },
-    purchases: { label: 'Purchases', color: '#16a34a' },
-    categories: { label: 'Categories' },
-  };
-
   return (
     <div className="container py-10">
       <div className="flex justify-between items-center mb-8">
@@ -180,192 +164,45 @@ const AdminDashboardPage = () => {
         </TabsList>
 
         <TabsContent value="stats">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium">Total Page Views</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{mockStats.totalViews.toLocaleString()}</div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium">Total Sales</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{mockStats.totalPurchases.toLocaleString()}</div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium">Categories</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{categories.length}</div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium">Products</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{adminProducts.length}</div>
-              </CardContent>
-            </Card>
-          </div>
+          <StatsOverview
+            totalViews={mockStats.totalViews}
+            totalPurchases={mockStats.totalPurchases}
+            totalCategories={categories.length}
+            totalProducts={adminProducts.length}
+          />
           
-          {/* Collapsible Charts */}
           <div className="space-y-6">
-            <Dialog>
-              <DialogTrigger asChild>
-                <Card className="cursor-pointer hover:border-primary/50 transition-colors">
-                  <CardHeader>
-                    <CardTitle>Traffic Overview</CardTitle>
-                    <CardDescription>Website views and purchases over time</CardDescription>
-                  </CardHeader>
-                  <CardContent className="h-[100px] flex items-center justify-center text-muted-foreground">
-                    Click to view detailed chart
-                  </CardContent>
-                </Card>
-              </DialogTrigger>
-              <DialogContent className="max-w-4xl">
-                <DialogHeader>
-                  <DialogTitle>Traffic Overview</DialogTitle>
-                  <DialogDescription>
-                    Website views and purchases over the last 30 days
-                  </DialogDescription>
-                </DialogHeader>
-                <div className="h-[400px] mt-4">
-                  <ChartContainer config={chartConfig}>
-                    <AreaChart data={timeData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
-                      <defs>
-                        <linearGradient id="colorViews" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%" stopColor="#2563eb" stopOpacity={0.8}/>
-                          <stop offset="95%" stopColor="#2563eb" stopOpacity={0}/>
-                        </linearGradient>
-                        <linearGradient id="colorPurchases" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%" stopColor="#16a34a" stopOpacity={0.8}/>
-                          <stop offset="95%" stopColor="#16a34a" stopOpacity={0}/>
-                        </linearGradient>
-                      </defs>
-                      <XAxis dataKey="date" />
-                      <YAxis />
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <ChartTooltip content={<ChartTooltipContent />} />
-                      <Area type="monotone" dataKey="views" stroke="#2563eb" fillOpacity={1} fill="url(#colorViews)" />
-                      <Area type="monotone" dataKey="purchases" stroke="#16a34a" fillOpacity={1} fill="url(#colorPurchases)" />
-                      <ChartLegend content={<ChartLegendContent />} />
-                    </AreaChart>
-                  </ChartContainer>
-                </div>
-              </DialogContent>
-            </Dialog>
+            <ChartDialog
+              title="Traffic Overview"
+              description="Website views and purchases over time"
+            >
+              <TimeSeriesChart data={timeData} />
+            </ChartDialog>
             
-            <Dialog>
-              <DialogTrigger asChild>
-                <Card className="cursor-pointer hover:border-primary/50 transition-colors">
-                  <CardHeader>
-                    <CardTitle>Category Performance</CardTitle>
-                    <CardDescription>Views and purchases by category</CardDescription>
-                  </CardHeader>
-                  <CardContent className="h-[100px] flex items-center justify-center text-muted-foreground">
-                    Click to view detailed chart
-                  </CardContent>
-                </Card>
-              </DialogTrigger>
-              <DialogContent className="max-w-4xl">
-                <DialogHeader>
-                  <DialogTitle>Category Performance</DialogTitle>
-                  <DialogDescription>
-                    Comparison of views and purchases across all product categories
-                  </DialogDescription>
-                </DialogHeader>
-                <div className="h-[400px] mt-4">
-                  <ChartContainer config={chartConfig}>
-                    <BarChart data={mockStats.categoryStats} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
-                      <XAxis dataKey="category" />
-                      <YAxis />
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <ChartTooltip content={<ChartTooltipContent />} />
-                      <Bar dataKey="views" fill="#2563eb" name="Views" />
-                      <Bar dataKey="purchases" fill="#16a34a" name="Purchases" />
-                      <ChartLegend content={<ChartLegendContent />} />
-                    </BarChart>
-                  </ChartContainer>
-                </div>
-              </DialogContent>
-            </Dialog>
+            <ChartDialog
+              title="Category Performance"
+              description="Views and purchases by category"
+            >
+              <CategoryPerformanceChart data={mockStats.categoryStats} />
+            </ChartDialog>
             
-            <Dialog>
-              <DialogTrigger asChild>
-                <Card className="cursor-pointer hover:border-primary/50 transition-colors">
-                  <CardHeader>
-                    <CardTitle>Top Products</CardTitle>
-                    <CardDescription>Most viewed and purchased products</CardDescription>
-                  </CardHeader>
-                  <CardContent className="h-[100px] flex items-center justify-center text-muted-foreground">
-                    Click to view detailed chart
-                  </CardContent>
-                </Card>
-              </DialogTrigger>
-              <DialogContent className="max-w-4xl">
-                <DialogHeader>
-                  <DialogTitle>Top Products</DialogTitle>
-                  <DialogDescription>
-                    Performance of your best-selling products
-                  </DialogDescription>
-                </DialogHeader>
-                <div className="h-[400px] mt-4 grid grid-cols-1 md:grid-cols-2 gap-8">
-                  <div>
-                    <h3 className="text-center mb-4">Views</h3>
-                    <ResponsiveContainer width="100%" height={300}>
-                      <PieChart>
-                        <Pie
-                          data={mockStats.topProducts}
-                          cx="50%"
-                          cy="50%"
-                          labelLine={false}
-                          outerRadius={100}
-                          fill="#8884d8"
-                          dataKey="views"
-                          nameKey="name"
-                          label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
-                        >
-                          {mockStats.topProducts.map((entry, index) => (
-                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                          ))}
-                        </Pie>
-                        <ChartTooltip />
-                      </PieChart>
-                    </ResponsiveContainer>
-                  </div>
-                  <div>
-                    <h3 className="text-center mb-4">Purchases</h3>
-                    <ResponsiveContainer width="100%" height={300}>
-                      <PieChart>
-                        <Pie
-                          data={mockStats.topProducts}
-                          cx="50%"
-                          cy="50%"
-                          labelLine={false}
-                          outerRadius={100}
-                          fill="#8884d8"
-                          dataKey="purchases"
-                          nameKey="name"
-                          label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
-                        >
-                          {mockStats.topProducts.map((entry, index) => (
-                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                          ))}
-                        </Pie>
-                        <ChartTooltip />
-                      </PieChart>
-                    </ResponsiveContainer>
-                  </div>
-                </div>
-              </DialogContent>
-            </Dialog>
+            <ChartDialog
+              title="Top Products"
+              description="Most viewed and purchased products"
+            >
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <TopProductsChart
+                  data={mockStats.topProducts}
+                  dataKey="views"
+                  title="Views"
+                />
+                <TopProductsChart
+                  data={mockStats.topProducts}
+                  dataKey="purchases"
+                  title="Purchases"
+                />
+              </div>
+            </ChartDialog>
           </div>
         </TabsContent>
 
